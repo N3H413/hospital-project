@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // 1. Import navigation hook
+import { useNavigate } from 'react-router-dom'; 
 import ContactWidget from '../components/ContactWidget';
-import { ArrowRight, Coffee, Pill, Car, CheckCircle, AlertTriangle, Heart, Baby, Bone } from 'lucide-react';
+// Kept only the icons that are actively used in the JSX below
+import { ArrowRight, Coffee, Pill, Car, CheckCircle, AlertTriangle } from 'lucide-react'; 
 
 // Dynamic production URL with local fallback
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
 
 export default function Home() {
-  const navigate = useNavigate(); // 2. Initialize router mechanism
+  const navigate = useNavigate(); 
   const [activeTab, setActiveTab] = useState('cafeteria');
   const [cafeteriaMenu, setCafeteriaMenu] = useState([]);
   const [pharmacyStock, setPharmacyStock] = useState([]);
+  const [departments, setDepartments] = useState([]); // Dynamic departments state
   
   const parkingBlocks = [
     { zone: "Basement 1 (OPD Visitors)", total: "150 Bays", open: 12, status: "Nearly Full" },
@@ -18,22 +20,24 @@ export default function Home() {
     { zone: "Ground Floor (Emergency Only)", total: "20 Bays", open: 2, status: "Critical Priority Only" },
   ];
 
-  const specializedBranches = [
-    { name: 'Cardiology', icon: <Heart className="w-5 h-5" />, style: 'bg-red-50 text-red-500', desc: 'Comprehensive cardiac diagnostics, advanced imaging, and tailored treatment regimens.' },
-    { name: 'Pediatrics', icon: <Baby className="w-5 h-5" />, style: 'bg-blue-50 text-blue-500', desc: 'Expert neonatal supervision, childhood immunizations, and general adolescent wellness.' },
-    { name: 'Orthopedics', icon: <Bone className="w-5 h-5" />, style: 'bg-amber-50 text-amber-600', desc: 'Surgical and therapeutic interventions for joint modifications, structural repairs, and bone health.' }
-  ];
-
   useEffect(() => {
+    // Fetch Cafeteria Menu
     fetch(`${API_BASE_URL}/api/cafeteria/`)
       .then(res => res.json())
       .then(data => setCafeteriaMenu(data))
       .catch(err => console.error("Error loading cafeteria data:", err));
 
+    // Fetch Pharmacy Inventory
     fetch(`${API_BASE_URL}/api/pharmacy/`)
       .then(res => res.json())
       .then(data => setPharmacyStock(data))
       .catch(err => console.error("Error loading pharmacy metrics:", err));
+
+    // Fetch All Departments Dynamically
+    fetch(`${API_BASE_URL}/api/departments/`)
+      .then(res => res.json())
+      .then(data => setDepartments(data))
+      .catch(err => console.error("Error loading departments:", err));
   }, []);
 
   return (
@@ -49,7 +53,6 @@ export default function Home() {
           Welcome to the HopeCare Client Portal. Explore specialized medical units, look up our staff rosters, and book local clinical consults seamlessly.
         </p>
         
-        {/* 3. Add the navigation callback trigger here */}
         <button 
           onClick={() => navigate('/booking')} 
           className="bg-white text-emerald-800 hover:bg-emerald-50 text-xs md:text-sm font-bold px-5 py-2.5 rounded-xl transition-all inline-flex items-center gap-1.5 shadow-xs mx-auto cursor-pointer"
@@ -58,20 +61,17 @@ export default function Home() {
         </button>
       </div>
 
-      {/* Core Services Menu Area */}
+      {/* Core Services Menu Area (Now fully dynamic) */}
       <div className="space-y-4">
         <div className="text-center">
           <h2 className="text-xl font-bold text-gray-800">Our Medical Services</h2>
           <p className="text-xs text-gray-400 mt-0.5">Select an active branch to explore available practitioners</p>
         </div>
         <div className="grid sm:grid-cols-3 gap-4">
-          {specializedBranches.map((branch) => (
-            <div key={branch.name} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-xs space-y-3">
-              <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${branch.style}`}>
-                {branch.icon}
-              </div>
-              <h3 className="font-bold text-gray-800 text-sm">{branch.name}</h3>
-              <p className="text-xs text-gray-500 leading-relaxed">{branch.desc}</p>
+          {departments.map((dept) => (
+            <div key={dept.id} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-xs space-y-3">
+              <h3 className="font-bold text-gray-800 text-sm">{dept.name}</h3>
+              <p className="text-xs text-gray-500 leading-relaxed">{dept.description}</p>
             </div>
           ))}
         </div>
