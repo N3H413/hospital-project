@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Department, Doctor, Appointment
+# ➕ Added Cafeteria and Pharmacy to the import statement
+from .models import Department, Doctor, Appointment, Cafeteria, Pharmacy
 
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
@@ -14,3 +15,13 @@ class DoctorAdmin(admin.ModelAdmin):
 class AppointmentAdmin(admin.ModelAdmin):
     list_display = ('patient_name', 'doctor', 'date', 'time_slot')
     list_filter = ('date', 'doctor')
+
+# ➕ Added registration for Cafeteria
+@admin.register(Cafeteria)
+class CafeteriaAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'price')  # Customize these fields based on your model's attributes
+
+# ➕ Added registration for Pharmacy
+@admin.register(Pharmacy)
+class PharmacyAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'stock')  # Customize these fields based on your model's attributes
