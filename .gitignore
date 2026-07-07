@@ -1,0 +1,17 @@
+# === Python / Django Secrets & Junk ===
+backend/venv/
+backend/.env
+*.pyc
+__pycache__/
+db.sqlite3
+staticfiles/
+
+# === React / Frontend Frontend Junk ===
+25b4506-frontend/node_modules/
+25b4506-frontend/dist/
+25b4506-frontend/.env.local
+25b4506-frontend/.env.production
+
+# === OS Specific Junk ===
+.DS_Store
+Thumbs.db
