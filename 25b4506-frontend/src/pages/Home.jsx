@@ -1,18 +1,35 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import ContactWidget from '../components/ContactWidget';
-// Kept only the icons that are actively used in the JSX below
-import { ArrowRight, Coffee, Pill, Car, CheckCircle, AlertTriangle } from 'lucide-react'; 
+// Imported all the necessary icons for the dashboard and specific department branches
+import { 
+  ArrowRight, Coffee, Pill, Car, CheckCircle, AlertTriangle, 
+  Heart, Baby, Bone, Brain, Stethoscope, Activity 
+} from 'lucide-react'; 
 
-// Dynamic production URL with local fallback
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+
+// Client-side UI theme map for your departments
+const departmentVisuals = {
+  'cardiology': { icon: <Heart className="w-5 h-5" />, style: 'bg-red-50 text-red-500' },
+  'pediatrics': { icon: <Baby className="w-5 h-5" />, style: 'bg-blue-50 text-blue-500' },
+  'orthopedics': { icon: <Bone className="w-5 h-5" />, style: 'bg-amber-50 text-amber-600' },
+  'general medicine': { icon: <Stethoscope className="w-5 h-5" />, style: 'bg-emerald-50 text-emerald-600' },
+  'neurology': { icon: <Brain className="w-5 h-5" />, style: 'bg-purple-50 text-purple-600' }
+};
+
+// Fallback helper function if a department name doesn't match the map
+const getDepartmentTheme = (name) => {
+  const normalized = name.toLowerCase().trim();
+  return departmentVisuals[normalized] || { icon: <Activity className="w-5 h-5" />, style: 'bg-slate-50 text-slate-500' };
+};
 
 export default function Home() {
   const navigate = useNavigate(); 
   const [activeTab, setActiveTab] = useState('cafeteria');
   const [cafeteriaMenu, setCafeteriaMenu] = useState([]);
   const [pharmacyStock, setPharmacyStock] = useState([]);
-  const [departments, setDepartments] = useState([]); // Dynamic departments state
+  const [departments, setDepartments] = useState([]); 
   
   const parkingBlocks = [
     { zone: "Basement 1 (OPD Visitors)", total: "150 Bays", open: 12, status: "Nearly Full" },
@@ -21,19 +38,16 @@ export default function Home() {
   ];
 
   useEffect(() => {
-    // Fetch Cafeteria Menu
     fetch(`${API_BASE_URL}/api/cafeteria/`)
       .then(res => res.json())
       .then(data => setCafeteriaMenu(data))
       .catch(err => console.error("Error loading cafeteria data:", err));
 
-    // Fetch Pharmacy Inventory
     fetch(`${API_BASE_URL}/api/pharmacy/`)
       .then(res => res.json())
       .then(data => setPharmacyStock(data))
       .catch(err => console.error("Error loading pharmacy metrics:", err));
 
-    // Fetch All Departments Dynamically
     fetch(`${API_BASE_URL}/api/departments/`)
       .then(res => res.json())
       .then(data => setDepartments(data))
@@ -61,19 +75,27 @@ export default function Home() {
         </button>
       </div>
 
-      {/* Core Services Menu Area (Now fully dynamic) */}
+      {/* Core Services Menu Area */}
       <div className="space-y-4">
         <div className="text-center">
           <h2 className="text-xl font-bold text-gray-800">Our Medical Services</h2>
           <p className="text-xs text-gray-400 mt-0.5">Select an active branch to explore available practitioners</p>
         </div>
         <div className="grid sm:grid-cols-3 gap-4">
-          {departments.map((dept) => (
-            <div key={dept.id} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-xs space-y-3">
-              <h3 className="font-bold text-gray-800 text-sm">{dept.name}</h3>
-              <p className="text-xs text-gray-500 leading-relaxed">{dept.description}</p>
-            </div>
-          ))}
+          {departments.map((dept) => {
+            // Determine design assets dynamically using our helper function
+            const theme = getDepartmentTheme(dept.name);
+            return (
+              <div key={dept.id} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-xs space-y-3">
+                {/* Dynamically Styled Icon Badge Wrapper */}
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${theme.style}`}>
+                  {theme.icon}
+                </div>
+                <h3 className="font-bold text-gray-800 text-sm">{dept.name}</h3>
+                <p className="text-xs text-gray-500 leading-relaxed">{dept.description}</p>
+              </div>
+            );
+          })}
         </div>
       </div>
 
