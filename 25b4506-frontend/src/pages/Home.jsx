@@ -83,15 +83,18 @@ export default function Home() {
         </div>
         <div className="grid sm:grid-cols-3 gap-4">
           {departments.map((dept) => {
-            // Determine design assets dynamically using our helper function
             const theme = getDepartmentTheme(dept.name);
             return (
-              <div key={dept.id} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-xs space-y-3">
+              <div 
+                key={dept.id} 
+                onClick={() => navigate('/doctors', { state: { selectedDepartmentId: dept.id } })}
+                className="bg-white border border-gray-100 rounded-2xl p-5 shadow-xs space-y-3 cursor-pointer hover:border-emerald-500 hover:shadow-sm transition-all group text-left"
+              >
                 {/* Dynamically Styled Icon Badge Wrapper */}
                 <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${theme.style}`}>
                   {theme.icon}
                 </div>
-                <h3 className="font-bold text-gray-800 text-sm">{dept.name}</h3>
+                <h3 className="font-bold text-gray-800 text-sm group-hover:text-emerald-700 transition-colors">{dept.name}</h3>
                 <p className="text-xs text-gray-500 leading-relaxed">{dept.description}</p>
               </div>
             );
